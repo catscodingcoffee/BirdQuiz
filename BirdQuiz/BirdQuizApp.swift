@@ -1,11 +1,5 @@
-//
-//  BirdQuizApp.swift
-//  BirdQuiz
-//
-//  Created by Brandon Smith on 3/24/26.
-//
-
 import SwiftUI
+import SwiftData
 
 @main
 struct BirdQuizApp: App {
@@ -13,5 +7,6 @@ struct BirdQuizApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: [Deck.self, DeckCard.self])
     }
 }
