@@ -18,8 +18,8 @@ A flashcard-style bird identification quiz app for iPhone.
 | Source | Used for |
 |---|---|
 | [eBird API](https://documenter.getpostman.com/view/664302/S1ENwy59) | Full species taxonomy & search |
-| [Macaulay Library](https://www.macaulaylibrary.org) | Photos and audio (Cornell Lab) |
-| [Xeno-canto](https://xeno-canto.org/explore/api) | Audio fallback |
+| [iNaturalist API](https://api.inaturalist.org/v1/docs/) | Bird photos (public, no auth required) |
+| [Xeno-canto](https://xeno-canto.org/explore/api) | Audio clips |
 
 ## Setup in Xcode
 
@@ -47,9 +47,10 @@ BirdQuiz/
 │   └── DeckModels.swift
 ├── Services/
 │   ├── eBirdService.swift
-│   ├── MacaulayService.swift
+│   ├── iNaturalistService.swift
 │   ├── XenoCantoService.swift
-│   └── MediaService.swift
+│   ├── MediaService.swift
+│   └── KeychainHelper.swift
 ├── ViewModels/
 │   ├── BirdSearchViewModel.swift
 │   └── QuizViewModel.swift
@@ -93,5 +94,6 @@ Select your iPhone or a simulator (iOS 17+) and hit Run.
 ## Notes
 
 - **Minimum iOS**: 17.0 (uses SwiftData and `@Observable`-compatible patterns)
-- **Macaulay Library API**: This uses the same search API as the macaulaylibrary.org website. It is not officially documented for third-party use — if it stops working, the app will show placeholder images/audio. The Xeno-canto fallback for audio is a fully public API.
+- **iNaturalist API**: Photos are fetched from the public iNaturalist taxa API — no authentication required. Audio is fetched from the Xeno-canto public API.
+- **API Key storage**: Your eBird API key is stored securely in the iOS Keychain (not UserDefaults).
 - **Offline**: Once media URLs are fetched and saved per card, the card row thumbnails and quiz will load from cache (iOS URLCache). The taxonomy is stored in UserDefaults after first download.
