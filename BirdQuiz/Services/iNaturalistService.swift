@@ -37,37 +37,36 @@ class iNaturalistService {
         }
     }
 
-    // MARK: - Observations response (multiple research-grade photos)
+    // MARK: - Taxon detail response (curated taxon_photos)
 
-    private struct ObservationsResponse: Codable {
-        let results: [Observation]
+    private struct TaxonDetailResponse: Codable {
+        let results: [TaxonDetail]
     }
 
-    private struct Observation: Codable {
-        let observationPhotos: [ObservationPhoto]
+    private struct TaxonDetail: Codable {
+        let taxonPhotos: [TaxonPhoto]
         enum CodingKeys: String, CodingKey {
-            case observationPhotos = "observation_photos"
+            case taxonPhotos = "taxon_photos"
         }
     }
 
-    private struct ObservationPhoto: Codable {
+    private struct TaxonPhoto: Codable {
         let photo: Photo?
     }
 
     // MARK: - Public API
 
-    /// Returns up to 20 research-grade observation photo URLs for a species.
-    /// Falls back to the taxon default photo if no observations are found.
+    /// Returns the curated taxon_photos for a species (iNaturalist-moderated).
+    /// Falls back to the taxon default photo if no taxon photos are found.
     func photoURLs(sciName: String, commonName: String) async -> [String] {
         guard let (taxonId, defaultPhotoURL) = await resolveTaxon(sciName: sciName, commonName: commonName) else {
             return []
         }
 
-        let obsURLs = await fetchObservationPhotos(taxonId: taxonId)
-        if !obsURLs.isEmpty { return obsURLs }
+        let taxonPhotoURLs = await fetchTaxonPhotos(taxonId: taxonId)
+        if !taxonPhotoURLs.isEmpty { return taxonPhotoURLs }
 
-        // Fall back to the taxon's own default photo if no observations matched
-        print("[iNat] no observation photos found, using default photo for '\(commonName)'")
+        print("[iNat] no taxon photos found, using default photo for '\(commonName)'")
         return defaultPhotoURL.map { [$0] } ?? []
     }
 
@@ -102,29 +101,21 @@ class iNaturalistService {
               taxon.preferredCommonName?.lowercased() == expectedCommonName.lowercased()
         else { return nil }
 
-        print("[iNat] resolved taxon ID \(taxonId) for '\(commonName)'")
+        print("[iNat] resolved taxon ID \(taxonId) for '\(expectedCommonName)'")
         return (taxonId, taxon.defaultPhoto?.resolvedMediumUrl)
     }
 
-    private func fetchObservationPhotos(taxonId: Int) async -> [String] {
-        var components = URLComponents(string: "https://api.inaturalist.org/v1/observations")!
-        components.queryItems = [
-            URLQueryItem(name: "taxon_id", value: String(taxonId)),
-            URLQueryItem(name: "quality_grade", value: "research"),
-            URLQueryItem(name: "photos", value: "true"),
-            URLQueryItem(name: "per_page", value: "20"),
-            URLQueryItem(name: "order_by", value: "votes")
-        ]
-        guard let url = components.url,
-              let (data, _) = try? await URLSession.shared.data(from: url),
-              let response = try? JSONDecoder().decode(ObservationsResponse.self, from: data)
+    private func fetchTaxonPhotos(taxonId: Int) async -> [String] {
+        guard let url = URL(string: "https://api.inaturalist.org/v1/taxa/\(taxonId)") else { return [] }
+        guard let (data, _) = try? await URLSession.shared.data(from: url),
+              let response = try? JSONDecoder().decode(TaxonDetailResponse.self, from: data)
         else {
-            print("[iNat] observations request failed for taxon \(taxonId)")
+            print("[iNat] taxon detail request failed for taxon \(taxonId)")
             return []
         }
 
-        let urls = response.results.compactMap { $0.observationPhotos.first?.photo?.resolvedMediumUrl }
-        print("[iNat] fetched \(urls.count) observation photos for taxon \(taxonId)")
+        let urls = response.results.first?.taxonPhotos.compactMap { $0.photo?.resolvedMediumUrl } ?? []
+        print("[iNat] fetched \(urls.count) taxon photos for taxon \(taxonId)")
         return urls
     }
 }

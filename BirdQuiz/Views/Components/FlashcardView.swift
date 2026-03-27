@@ -78,6 +78,7 @@ private struct ImageFaceContent: View {
             }
         }
         .onAppear { pickRandomPhoto() }
+        .onChange(of: card.id) { pickRandomPhoto() }
         .overlay(alignment: .bottom) {
             Text("Tap to reveal")
                 .font(.caption)
