@@ -8,6 +8,11 @@ struct ContentView: View {
                     Label("Decks", systemImage: "rectangle.stack")
                 }
 
+            StatsView()
+                .tabItem {
+                    Label("Stats", systemImage: "chart.bar")
+                }
+
             SettingsView()
                 .tabItem {
                     Label("Settings", systemImage: "gear")

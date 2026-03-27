@@ -4,8 +4,8 @@ struct QuizView: View {
     @StateObject private var vm: QuizViewModel
     @Environment(\.dismiss) private var dismiss
 
-    init(deck: Deck, quizMode: QuizMode, mediaMode: MediaMode) {
-        _vm = StateObject(wrappedValue: QuizViewModel(deck: deck, quizMode: quizMode, mediaMode: mediaMode))
+    init(deck: Deck, quizMode: QuizMode, mediaMode: MediaMode, context: ModelContext) {
+        _vm = StateObject(wrappedValue: QuizViewModel(deck: deck, quizMode: quizMode, mediaMode: mediaMode, context: context))
     }
 
     var body: some View {

@@ -7,6 +7,6 @@ struct BirdQuizApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: [Deck.self, DeckCard.self])
+        .modelContainer(for: [Deck.self, DeckCard.self, BirdStat.self])
     }
 }

@@ -84,7 +84,7 @@ struct DeckDetailView: View {
             .presentationDetents([.medium])
         }
         .fullScreenCover(isPresented: $showingQuiz) {
-            QuizView(deck: deck, quizMode: quizMode, mediaMode: mediaMode)
+            QuizView(deck: deck, quizMode: quizMode, mediaMode: mediaMode, context: context)
         }
     }
 

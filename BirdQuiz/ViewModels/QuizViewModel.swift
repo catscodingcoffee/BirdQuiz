@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import AVFoundation
+import SwiftData
 
 @MainActor
 class QuizViewModel: ObservableObject {
@@ -8,6 +9,7 @@ class QuizViewModel: ObservableObject {
     let deck: Deck
     let quizMode: QuizMode
     let mediaMode: MediaMode
+    private let context: ModelContext
 
     // MARK: - State
     @Published var currentIndex = 0
@@ -45,10 +47,11 @@ class QuizViewModel: ObservableObject {
         }
     }
 
-    init(deck: Deck, quizMode: QuizMode, mediaMode: MediaMode) {
+    init(deck: Deck, quizMode: QuizMode, mediaMode: MediaMode, context: ModelContext) {
         self.deck = deck
         self.quizMode = quizMode
         self.mediaMode = mediaMode
+        self.context = context
         self.shuffledCards = deck.cards.shuffled()
         buildChoicesForCurrentCard()
     }
@@ -60,11 +63,13 @@ class QuizViewModel: ObservableObject {
     }
 
     func markCorrect() {
+        if let card = currentCard { recordResult(for: card, correct: true) }
         score.correct += 1
         advance()
     }
 
     func markIncorrect() {
+        if let card = currentCard { recordResult(for: card, correct: false) }
         score.incorrect += 1
         advance()
     }
@@ -73,13 +78,36 @@ class QuizViewModel: ObservableObject {
         guard selectedAnswer == nil else { return }
         selectedAnswer = answer
 
-        if answer == currentCard?.commonName {
+        let isCorrect = answer == currentCard?.commonName
+        if let card = currentCard { recordResult(for: card, correct: isCorrect) }
+
+        if isCorrect {
             score.correct += 1
         } else {
             score.incorrect += 1
         }
 
         showingResult = true
+    }
+
+    // MARK: - Stats
+
+    private func recordResult(for card: DeckCard, correct: Bool) {
+        let code = card.speciesCode
+        let descriptor = FetchDescriptor<BirdStat>(
+            predicate: #Predicate { $0.speciesCode == code }
+        )
+        let stat = (try? context.fetch(descriptor))?.first ?? {
+            let s = BirdStat(speciesCode: card.speciesCode,
+                             commonName: card.commonName,
+                             scientificName: card.scientificName)
+            context.insert(s)
+            return s
+        }()
+
+        if correct { stat.correctCount += 1 } else { stat.incorrectCount += 1 }
+        stat.lastAttemptedAt = Date()
+        try? context.save()
     }
 
     func advanceAfterMCQ() {
