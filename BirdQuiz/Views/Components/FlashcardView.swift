@@ -82,16 +82,16 @@ private struct ImageFaceContent: View {
         .onAppear { pickRandomPhoto() }
         .onChange(of: card.id) { pickRandomPhoto() }
         .overlay(alignment: .topTrailing) {
-            if card.soundURL != nil {
-                Button(action: onPlay) {
-                    Image(systemName: isPlayingAudio ? "speaker.wave.2.fill" : "speaker.fill")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .padding(10)
-                        .background(.ultraThinMaterial, in: Circle())
-                }
-                .padding(12)
+            Button(action: onPlay) {
+                Image(systemName: isPlayingAudio ? "speaker.wave.2.fill" : "speaker.fill")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .padding(10)
+                    .background(.ultraThinMaterial, in: Circle())
             }
+            .disabled(card.soundURL == nil)
+            .opacity(card.soundURL == nil ? 0.4 : 1.0)
+            .padding(12)
         }
         .overlay(alignment: .bottom) {
             Text("Tap to reveal")
