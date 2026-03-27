@@ -15,7 +15,7 @@ struct FlashcardView: View {
                 if useSound {
                     SoundFaceContent(card: card, isPlaying: isPlayingAudio, onPlay: onPlay)
                 } else {
-                    ImageFaceContent(card: card)
+                    ImageFaceContent(card: card, isPlayingAudio: isPlayingAudio, onPlay: onPlay)
                 }
             }
             .opacity(isFlipped ? 0 : 1)
@@ -56,6 +56,8 @@ private struct CardFace<Content: View>: View {
 
 private struct ImageFaceContent: View {
     let card: DeckCard
+    let isPlayingAudio: Bool
+    let onPlay: () -> Void
     @State private var photoURL: URL?
 
     var body: some View {
@@ -79,6 +81,18 @@ private struct ImageFaceContent: View {
         }
         .onAppear { pickRandomPhoto() }
         .onChange(of: card.id) { pickRandomPhoto() }
+        .overlay(alignment: .topTrailing) {
+            if card.soundURL != nil {
+                Button(action: onPlay) {
+                    Image(systemName: isPlayingAudio ? "speaker.wave.2.fill" : "speaker.fill")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .padding(10)
+                        .background(.ultraThinMaterial, in: Circle())
+                }
+                .padding(12)
+            }
+        }
         .overlay(alignment: .bottom) {
             Text("Tap to reveal")
                 .font(.caption)

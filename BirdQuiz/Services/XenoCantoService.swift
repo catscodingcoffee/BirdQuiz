@@ -7,8 +7,8 @@ class XenoCantoService {
     static let shared = XenoCantoService()
 
     func fetchRecordings(sciName: String, count: Int = 5) async throws -> [XenoCantoRecording] {
-        // Prefer "song" type, quality A/B
-        let query = "\(sciName) q:A type:song"
+        // Prefer "call" type, quality A/B
+        let query = "\(sciName) q:A type:call"
         var components = URLComponents(string: "https://xeno-canto.org/api/2/recordings")!
         components.queryItems = [URLQueryItem(name: "query", value: query)]
 
