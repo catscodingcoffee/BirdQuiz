@@ -303,6 +303,8 @@ private struct ResultsView: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 32)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(.systemBackground))
     }
 
     private var scoreColor: Color {

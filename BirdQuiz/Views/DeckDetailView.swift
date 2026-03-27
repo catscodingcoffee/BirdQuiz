@@ -194,15 +194,15 @@ private struct QuizSetupSheet: View {
                         .onTapGesture { mediaMode = mode }
                     }
                 }
-
-                Section {
-                    Button(action: {
-                        dismiss()
-                        // Small delay to let sheet dismiss before fullScreenCover presents
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            onStart()
-                        }
-                    }) {
+            }
+            .safeAreaInset(edge: .bottom) {
+                Button(action: {
+                    dismiss()
+                    // Small delay to let sheet dismiss before fullScreenCover presents
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        onStart()
+                    }
+                }) {
                         HStack {
                             Spacer()
                             Label("Start Quiz (\(deck.cards.count) cards)", systemImage: "play.fill")
@@ -211,7 +211,6 @@ private struct QuizSetupSheet: View {
                         }
                     }
                     .tint(.blue)
-                }
             }
             .navigationTitle("Quiz Setup")
             .navigationBarTitleDisplayMode(.inline)
