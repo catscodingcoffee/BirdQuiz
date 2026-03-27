@@ -12,6 +12,8 @@ A flashcard-style bird identification quiz app for iPhone.
   - *Multiple Choice* — pick from 4 options, instant feedback
 - **Three Media Modes** — Image only, Sound only, or Mixed (alternates between the two)
 - **Score Screen** — percentage ring, correct/incorrect counts, restart button
+- **Stats Tab** — tracks correct/incorrect counts per species across all decks; shows birds that need the most work and your most-practiced birds
+- **Refresh Media** — re-fetch photos and audio for any deck via the ··· menu (useful if a card got the wrong image)
 
 ## Data Sources
 
@@ -44,6 +46,7 @@ BirdQuiz/
 ├── BirdQuizApp.swift
 ├── Models/
 │   ├── BirdSpecies.swift
+│   ├── BirdStat.swift
 │   └── DeckModels.swift
 ├── Services/
 │   ├── eBirdService.swift
@@ -60,6 +63,7 @@ BirdQuiz/
     ├── DeckDetailView.swift
     ├── BirdSearchSheet.swift
     ├── QuizView.swift
+    ├── StatsView.swift
     ├── SettingsView.swift
     └── Components/
         ├── FlashcardView.swift
@@ -94,6 +98,8 @@ Select your iPhone or a simulator (iOS 17+) and hit Run.
 ## Notes
 
 - **Minimum iOS**: 17.0 (uses SwiftData and `@Observable`-compatible patterns)
-- **iNaturalist API**: Photos are fetched from the public iNaturalist taxa API — no authentication required. Audio is fetched from the Xeno-canto public API.
+- **iNaturalist API**: Photos are fetched from the public iNaturalist taxa API — no authentication required. The lookup validates the returned species name to avoid mismatches caused by taxonomic differences between eBird and iNaturalist, falling back to a common-name search when needed.
+- **Audio**: Fetched from the Xeno-canto public API — no authentication required.
 - **API Key storage**: Your eBird API key is stored securely in the iOS Keychain (not UserDefaults).
 - **Offline**: Once media URLs are fetched and saved per card, the card row thumbnails and quiz will load from cache (iOS URLCache). The taxonomy is stored in UserDefaults after first download.
+- **Stats persistence**: Quiz results are stored in SwiftData and accumulate across sessions.
