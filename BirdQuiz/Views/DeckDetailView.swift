@@ -55,7 +55,7 @@ struct DeckDetailView: View {
             }
         }
         .safeAreaInset(edge: .bottom) {
-            if !deck.cards.isEmpty {
+            if !deck.cards.isEmpty && !showingQuiz {
                 Button {
                     showingQuizSetup = true
                 } label: {
