@@ -56,10 +56,11 @@ private struct CardFace<Content: View>: View {
 
 private struct ImageFaceContent: View {
     let card: DeckCard
+    @State private var photoURL: URL?
 
     var body: some View {
         Group {
-            if let urlString = card.imageURL, let url = URL(string: urlString) {
+            if let url = photoURL {
                 AsyncImage(url: url) { phase in
                     switch phase {
                     case .success(let image):
@@ -76,6 +77,7 @@ private struct ImageFaceContent: View {
                 PlaceholderContent(icon: "photo", message: "No image saved")
             }
         }
+        .onAppear { pickRandomPhoto() }
         .overlay(alignment: .bottom) {
             Text("Tap to reveal")
                 .font(.caption)
@@ -85,6 +87,11 @@ private struct ImageFaceContent: View {
                 .background(.ultraThinMaterial, in: Capsule())
                 .padding(.bottom, 16)
         }
+    }
+
+    private func pickRandomPhoto() {
+        let urls = card.photoURLs.compactMap { URL(string: $0) }
+        photoURL = urls.randomElement() ?? card.imageURL.flatMap { URL(string: $0) }
     }
 }
 

@@ -30,16 +30,18 @@ class DeckCard {
     var speciesCode: String
     var commonName: String
     var scientificName: String
-    var imageURL: String?
+    var imageURL: String?      // first photo, used for list thumbnails
+    var photoURLs: [String]    // full set of observation photos for random selection
     var soundURL: String?
     var addedAt: Date
 
-    init(species: BirdSpecies, imageURL: String? = nil, soundURL: String? = nil) {
+    init(species: BirdSpecies, imageURL: String? = nil, photoURLs: [String] = [], soundURL: String? = nil) {
         self.id = UUID()
         self.speciesCode = species.speciesCode
         self.commonName = species.comName
         self.scientificName = species.sciName
         self.imageURL = imageURL
+        self.photoURLs = photoURLs
         self.soundURL = soundURL
         self.addedAt = Date()
     }

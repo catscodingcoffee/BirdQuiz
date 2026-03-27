@@ -21,11 +21,12 @@ class MediaService {
     /// Must be called from the MainActor so SwiftData model mutations are on the right thread.
     @MainActor
     func populateMedia(for card: DeckCard) async {
-        async let photoTask = iNat.photoURL(sciName: card.scientificName, commonName: card.commonName)
+        async let photoTask = iNat.photoURLs(sciName: card.scientificName, commonName: card.commonName)
         async let audioTask = xenoCanto.bestAudioURL(sciName: card.scientificName)
-        let photo = await photoTask
+        let photos = await photoTask
         let audio = await audioTask
-        card.imageURL = photo
+        card.photoURLs = photos
+        card.imageURL = photos.first
         card.soundURL = audio
     }
 }
