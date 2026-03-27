@@ -15,7 +15,21 @@ struct FlashcardView: View {
                 if useSound {
                     SoundFaceContent(card: card, isPlaying: isPlayingAudio, onPlay: onPlay)
                 } else {
-                    ImageFaceContent(card: card, isPlayingAudio: isPlayingAudio, onPlay: onPlay)
+                    ImageFaceContent(card: card)
+                }
+            }
+            .overlay(alignment: .topTrailing) {
+                if !useSound {
+                    Button(action: onPlay) {
+                        Image(systemName: isPlayingAudio ? "speaker.wave.2.fill" : "speaker.fill")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .padding(10)
+                            .background(.ultraThinMaterial, in: Circle())
+                    }
+                    .disabled(card.soundURL == nil)
+                    .opacity(card.soundURL == nil ? 0.5 : 1.0)
+                    .padding(36) // inset from card edge to sit inside the rounded corners
                 }
             }
             .opacity(isFlipped ? 0 : 1)
@@ -56,13 +70,10 @@ private struct CardFace<Content: View>: View {
 
 private struct ImageFaceContent: View {
     let card: DeckCard
-    let isPlayingAudio: Bool
-    let onPlay: () -> Void
     @State private var photoURL: URL?
 
     var body: some View {
-        ZStack {
-            // Bird photo
+        Group {
             if let url = photoURL {
                 AsyncImage(url: url) { phase in
                     switch phase {
@@ -79,36 +90,18 @@ private struct ImageFaceContent: View {
             } else {
                 PlaceholderContent(icon: "photo", message: "No image saved")
             }
-
-            // Overlay controls pinned with spacers
-            VStack {
-                HStack {
-                    Spacer()
-                    // Speaker button — top-right
-                    Button(action: onPlay) {
-                        Image(systemName: isPlayingAudio ? "speaker.wave.2.fill" : "speaker.fill")
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(.white)
-                            .padding(10)
-                            .background(.ultraThinMaterial, in: Circle())
-                    }
-                    .disabled(card.soundURL == nil)
-                    .opacity(card.soundURL == nil ? 0.5 : 1.0)
-                    .padding(12)
-                }
-                Spacer()
-                // "Tap to reveal" — bottom centre
-                Text("Tap to reveal")
-                    .font(.caption)
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(.ultraThinMaterial, in: Capsule())
-                    .padding(.bottom, 16)
-            }
         }
         .onAppear { pickRandomPhoto() }
         .onChange(of: card.id) { pickRandomPhoto() }
+        .overlay(alignment: .bottom) {
+            Text("Tap to reveal")
+                .font(.caption)
+                .foregroundStyle(.white)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(.ultraThinMaterial, in: Capsule())
+                .padding(.bottom, 16)
+        }
     }
 
     private func pickRandomPhoto() {
