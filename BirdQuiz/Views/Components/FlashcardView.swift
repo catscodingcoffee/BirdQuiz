@@ -61,7 +61,8 @@ private struct ImageFaceContent: View {
     @State private var photoURL: URL?
 
     var body: some View {
-        Group {
+        ZStack(alignment: .topTrailing) {
+            // Bird photo
             if let url = photoURL {
                 AsyncImage(url: url) { phase in
                     switch phase {
@@ -78,10 +79,8 @@ private struct ImageFaceContent: View {
             } else {
                 PlaceholderContent(icon: "photo", message: "No image saved")
             }
-        }
-        .onAppear { pickRandomPhoto() }
-        .onChange(of: card.id) { pickRandomPhoto() }
-        .overlay(alignment: .topTrailing) {
+
+            // Speaker button — top-right corner
             Button(action: onPlay) {
                 Image(systemName: isPlayingAudio ? "speaker.wave.2.fill" : "speaker.fill")
                     .font(.system(size: 16, weight: .semibold))
@@ -92,16 +91,22 @@ private struct ImageFaceContent: View {
             .disabled(card.soundURL == nil)
             .opacity(card.soundURL == nil ? 0.4 : 1.0)
             .padding(12)
+
+            // "Tap to reveal" hint — bottom center
+            VStack {
+                Spacer()
+                Text("Tap to reveal")
+                    .font(.caption)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(.ultraThinMaterial, in: Capsule())
+                    .padding(.bottom, 16)
+            }
+            .frame(maxWidth: .infinity)
         }
-        .overlay(alignment: .bottom) {
-            Text("Tap to reveal")
-                .font(.caption)
-                .foregroundStyle(.white)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(.ultraThinMaterial, in: Capsule())
-                .padding(.bottom, 16)
-        }
+        .onAppear { pickRandomPhoto() }
+        .onChange(of: card.id) { pickRandomPhoto() }
     }
 
     private func pickRandomPhoto() {
