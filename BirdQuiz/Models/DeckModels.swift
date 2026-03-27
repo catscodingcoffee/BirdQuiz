@@ -30,8 +30,8 @@ class DeckCard {
     var speciesCode: String
     var commonName: String
     var scientificName: String
-    var imageURL: String?      // first photo, used for list thumbnails
-    var photoURLs: [String]    // full set of observation photos for random selection
+    var imageURL: String?           // first photo, used for list thumbnails
+    var photoURLs: [String] = []    // full set of observation photos for random selection
     var soundURL: String?
     var addedAt: Date
 
