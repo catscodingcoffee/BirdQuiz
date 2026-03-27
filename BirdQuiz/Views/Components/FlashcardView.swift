@@ -61,7 +61,7 @@ private struct ImageFaceContent: View {
     @State private var photoURL: URL?
 
     var body: some View {
-        ZStack(alignment: .topTrailing) {
+        ZStack {
             // Bird photo
             if let url = photoURL {
                 AsyncImage(url: url) { phase in
@@ -80,21 +80,24 @@ private struct ImageFaceContent: View {
                 PlaceholderContent(icon: "photo", message: "No image saved")
             }
 
-            // Speaker button — top-right corner
-            Button(action: onPlay) {
-                Image(systemName: isPlayingAudio ? "speaker.wave.2.fill" : "speaker.fill")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .padding(10)
-                    .background(.ultraThinMaterial, in: Circle())
-            }
-            .disabled(card.soundURL == nil)
-            .opacity(card.soundURL == nil ? 0.4 : 1.0)
-            .padding(12)
-
-            // "Tap to reveal" hint — bottom center
+            // Overlay controls pinned with spacers
             VStack {
+                HStack {
+                    Spacer()
+                    // Speaker button — top-right
+                    Button(action: onPlay) {
+                        Image(systemName: isPlayingAudio ? "speaker.wave.2.fill" : "speaker.fill")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .padding(10)
+                            .background(.ultraThinMaterial, in: Circle())
+                    }
+                    .disabled(card.soundURL == nil)
+                    .opacity(card.soundURL == nil ? 0.5 : 1.0)
+                    .padding(12)
+                }
                 Spacer()
+                // "Tap to reveal" — bottom centre
                 Text("Tap to reveal")
                     .font(.caption)
                     .foregroundStyle(.white)
@@ -103,7 +106,6 @@ private struct ImageFaceContent: View {
                     .background(.ultraThinMaterial, in: Capsule())
                     .padding(.bottom, 16)
             }
-            .frame(maxWidth: .infinity)
         }
         .onAppear { pickRandomPhoto() }
         .onChange(of: card.id) { pickRandomPhoto() }
