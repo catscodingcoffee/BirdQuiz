@@ -11,6 +11,7 @@ struct DeckDetailView: View {
     @State private var mediaMode: MediaMode = .image
     @State private var showingQuiz = false
     @State private var cardToDelete: DeckCard?
+    @State private var isRefreshingMedia = false
 
     var body: some View {
         List {
@@ -32,6 +33,25 @@ struct DeckDetailView: View {
                 } label: {
                     Label("Add Bird", systemImage: "plus")
                 }
+            }
+            ToolbarItem(placement: .secondaryAction) {
+                Button {
+                    Task {
+                        isRefreshingMedia = true
+                        for card in deck.cards {
+                            await MediaService.shared.refreshMedia(for: card)
+                        }
+                        try? context.save()
+                        isRefreshingMedia = false
+                    }
+                } label: {
+                    if isRefreshingMedia {
+                        ProgressView()
+                    } else {
+                        Label("Refresh Media", systemImage: "arrow.clockwise")
+                    }
+                }
+                .disabled(deck.cards.isEmpty || isRefreshingMedia)
             }
         }
         .safeAreaInset(edge: .bottom) {
