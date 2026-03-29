@@ -18,20 +18,6 @@ struct FlashcardView: View {
                     ImageFaceContent(card: card)
                 }
             }
-            .overlay(alignment: .topTrailing) {
-                if !useSound {
-                    Button(action: onPlay) {
-                        Image(systemName: isPlayingAudio ? "speaker.wave.2.fill" : "speaker.fill")
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(.white)
-                            .padding(10)
-                            .background(.ultraThinMaterial, in: Circle())
-                    }
-                    .disabled(card.soundURL == nil)
-                    .opacity(card.soundURL == nil ? 0.5 : 1.0)
-                    .padding(36) // inset from card edge to sit inside the rounded corners
-                }
-            }
             .opacity(isFlipped ? 0 : 1)
             .rotation3DEffect(.degrees(isFlipped ? 180 : 0), axis: (x: 0, y: 1, z: 0))
 

@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 struct QuizView: View {
     @StateObject private var vm: QuizViewModel
@@ -63,10 +64,29 @@ struct QuizView: View {
                     case .multipleChoice:
                         multipleChoiceControls
                     }
+
+                    // Speaker button (image mode only — sound mode has it inside the card)
+                    if !vm.useSound {
+                        speakerButton
+                    }
                 }
                 .padding(.bottom, 32)
             }
         }
+    }
+
+    // MARK: - Speaker Button
+
+    private var speakerButton: some View {
+        Button(action: { if vm.isPlayingAudio { vm.stopAudio() } else { vm.playAudio() } }) {
+            Image(systemName: vm.isPlayingAudio ? "speaker.wave.2.fill" : "speaker.fill")
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(.blue)
+                .padding(14)
+                .background(Circle().fill(.blue.opacity(0.1)))
+        }
+        .disabled(vm.currentCard?.soundURL == nil)
+        .opacity(vm.currentCard?.soundURL == nil ? 0.4 : 1.0)
     }
 
     // MARK: - Progress Bar
